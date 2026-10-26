@@ -1,0 +1,718 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Identity & Authentication
+// -----------------------------------------------------------------------------
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+  SUPPORT
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  DEACTIVATED
+}
+
+model User {
+  id               String       @id @default(uuid())
+  email            String       @unique
+  phone            String?
+  passwordHash     String
+  role             UserRole     @default(PATIENT)
+  status           UserStatus   @default(ACTIVE)
+  emailVerifiedAt  DateTime?
+  mfaSecretEnc     String?
+  mfaEnabled       Boolean      @default(false)
+  lastLoginAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  refreshTokens    RefreshToken[]
+  consents         Consent[]
+  patientProfile   PatientProfile?
+  doctorProfile    DoctorProfile?
+  files            File[]
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  userId     String
+  tokenHash  String
+  familyId   String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Consent {
+  id            String   @id @default(uuid())
+  userId        String
+  type          String
+  policyVersion String
+  acceptedAt    DateTime @default(now())
+  ip            String?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("consents")
+}
+
+model PolicyDocument {
+  id            String   @id @default(uuid())
+  type          String
+  version       String
+  bodyUrl       String?
+  effectiveFrom DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@unique([type, version])
+  @@map("policy_documents")
+}
+
+// -----------------------------------------------------------------------------
+// Profiles & Doctor Management
+// -----------------------------------------------------------------------------
+
+model PatientProfile {
+  userId               String   @id
+  fullName             String
+  dob                  DateTime?
+  sex                  String?
+  timezone             String   @default("Asia/Kolkata")
+  emergencyContactEnc  String?
+  preferredLanguage    String   @default("en")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("patient_profiles")
+}
+
+enum PracticeType {
+  INDEPENDENT
+  MANAGED
+}
+
+enum DoctorStatus {
+  APPLIED
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+model DoctorProfile {
+  userId               String       @id
+  slug                 String       @unique
+  displayName          String
+  bio                  String?
+  practiceType         PracticeType @default(INDEPENDENT)
+  yearsExperience      Int          @default(0)
+  consultationFeePaise Int          @default(50000) // ₹500
+  currency             String       @default("INR")
+  languages            String[]     @default(["English", "Hindi"])
+  acceptsInstant       Boolean      @default(false)
+  status               DoctorStatus @default(APPLIED)
+  country              String       @default("IN")
+  timeZone             String       @default("Asia/Kolkata")
+  ratingAvg            Float        @default(5.0)
+  ratingCount          Int          @default(0)
+  avatarUrl            String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties          DoctorSpecialty[]
+  credentials          DoctorCredential[]
+  agreements           DoctorAgreement[]
+  availabilityRules    DoctorAvailabilityRule[]
+  exceptions           AvailabilityException[]
+  subscriptions        DoctorSubscription[]
+
+  @@index([status, practiceType])
+  @@map("doctor_profiles")
+}
+
+model Specialty {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+
+  doctors     DoctorSpecialty[]
+
+  @@map("specialties")
+}
+
+model DoctorSpecialty {
+  doctorId    String
+  specialtyId String
+  isPrimary   Boolean @default(false)
+
+  doctor      DoctorProfile @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+  specialty   Specialty     @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@id([doctorId, specialtyId])
+  @@map("doctor_specialties")
+}
+
+enum CredentialStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  NEEDS_INFO
+  EXPIRING
+  EXPIRED
+}
+
+model DoctorCredential {
+  id                 String           @id @default(uuid())
+  doctorId           String
+  type               String
+  councilName        String
+  registrationNumber String
+  documentFileId     String?
+  status             CredentialStatus @default(SUBMITTED)
+  verifiedBy         String?
+  verifiedAt         DateTime?
+  expiresAt          DateTime?
+  notes              String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  doctor             DoctorProfile    @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+
+  @@index([doctorId])
+  @@index([status])
+  @@map("doctor_credentials")
+}
+
+model DoctorAgreement {
+  id            String    @id @default(uuid())
+  doctorId      String
+  version       String
+  commissionBps Int       // e.g. 1500 for 15%
+  termsPolicyId String?
+  effectiveFrom DateTime  @default(now())
+  effectiveTo   DateTime?
+  acceptedAt    DateTime  @default(now())
+
+  doctor        DoctorProfile @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+
+  @@map("doctor_agreements")
+}
+
+model DoctorAvailabilityRule {
+  id            String        @id @default(uuid())
+  doctorId      String
+  weekday       Int           // 0=Sun, 1=Mon, ..., 6=Sat
+  startTime     String        // "09:00"
+  endTime       String        // "17:00"
+  slotMinutes   Int           @default(30)
+  bufferMinutes Int           @default(5)
+  modeFlags     String[]      @default(["VIDEO", "AUDIO", "CHAT"])
+
+  doctor        DoctorProfile @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+
+  @@map("doctor_availability_rules")
+}
+
+model AvailabilityException {
+  id        String        @id @default(uuid())
+  doctorId  String
+  startDate DateTime
+  endDate   DateTime
+  kind      String        // "BLOCK" or "EXTRA"
+  reason    String?
+
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+
+  @@map("availability_exceptions")
+}
+
+// -----------------------------------------------------------------------------
+// Appointments & Consultation
+// -----------------------------------------------------------------------------
+
+enum AppointmentKind {
+  SCHEDULED
+  INSTANT
+}
+
+enum ConsultationMode {
+  VIDEO
+  AUDIO
+  CHAT
+}
+
+enum AppointmentStatus {
+  HELD
+  CONFIRMED
+  READY
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED_BY_PATIENT
+  CANCELLED_BY_DOCTOR
+  CANCELLED_BY_ADMIN
+  NO_SHOW_PATIENT
+  NO_SHOW_DOCTOR
+  EXPIRED
+}
+
+model Appointment {
+  id                    String            @id @default(uuid())
+  patientId             String
+  doctorId              String
+  kind                  AppointmentKind   @default(SCHEDULED)
+  mode                  ConsultationMode  @default(VIDEO)
+  startTime             DateTime
+  endTime               DateTime
+  status                AppointmentStatus @default(HELD)
+  feePaise              Int
+  platformFeePaise      Int               @default(0)
+  commissionBpsSnapshot Int
+  agreementId           String?
+  cancelPolicyVersion   String            @default("1.0")
+  holdExpiresAt         DateTime?
+  cancelledBy           String?
+  cancelReason          String?
+  patientSymptoms       String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  consultationSession   ConsultationSession?
+  chatMessages          ChatMessage[]
+  review                Review?
+  payments              Payment[]
+  encounter             Encounter?
+
+  @@index([doctorId, startTime, endTime])
+  @@index([patientId, createdAt])
+  @@index([status])
+  @@map("appointments")
+}
+
+model InstantRequest {
+  id            String    @id @default(uuid())
+  patientId     String
+  specialtyId   String
+  status        String    @default("REQUESTED")
+  offeredTo     String[]
+  acceptedBy    String?
+  appointmentId String?
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+
+  @@map("instant_requests")
+}
+
+model ConsultationSession {
+  id              String       @id @default(uuid())
+  appointmentId   String       @unique
+  provider        String       @default("mock")
+  roomId          String
+  status          String       @default("WAITING")
+  patientJoinedAt DateTime?
+  doctorJoinedAt  DateTime?
+  startedAt       DateTime?
+  endedAt         DateTime?
+  endReason       String?
+  createdAt       DateTime     @default(now())
+
+  appointment     Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@map("consultation_sessions")
+}
+
+model ChatMessage {
+  id            String       @id @default(uuid())
+  appointmentId String
+  senderId      String
+  bodyEnc       String
+  fileId        String?
+  deliveredAt   DateTime?
+  createdAt     DateTime     @default(now())
+
+  appointment   Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt])
+  @@map("chat_messages")
+}
+
+model Review {
+  id            String       @id @default(uuid())
+  appointmentId String       @unique
+  patientId     String
+  doctorId      String
+  rating        Int
+  comment       String?
+  status        String       @default("PUBLISHED")
+  createdAt     DateTime     @default(now())
+
+  appointment   Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, status])
+  @@map("reviews")
+}
+
+// -----------------------------------------------------------------------------
+// Clinical Records & Care
+// -----------------------------------------------------------------------------
+
+model CareRelationship {
+  id                  String    @id @default(uuid())
+  patientId           String
+  doctorId            String
+  startedAt           DateTime  @default(now())
+  endedAt             DateTime?
+  sourceAppointmentId String?
+
+  @@unique([patientId, doctorId])
+  @@map("care_relationships")
+}
+
+model RecordAccessGrant {
+  id            String    @id @default(uuid())
+  patientId     String
+  granteeUserId String
+  scope         String    @default("ALL")
+  grantedBy     String
+  expiresAt     DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([patientId, granteeUserId])
+  @@map("record_access_grants")
+}
+
+model Encounter {
+  id                       String         @id @default(uuid())
+  appointmentId            String         @unique
+  patientId                String
+  doctorId                 String
+  summaryEnc               String
+  diagnosisEnc             String
+  followUpInstructionsEnc String?
+  signedAt                 DateTime?
+  version                  Int            @default(1)
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  appointment              Appointment    @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  prescriptions            Prescription[]
+
+  @@map("encounters")
+}
+
+enum PrescriptionStatus {
+  DRAFT
+  ISSUED
+  AMENDED
+  REVOKED
+}
+
+model Prescription {
+  id            String             @id @default(uuid())
+  encounterId   String
+  doctorId      String
+  patientId     String
+  status        PrescriptionStatus @default(DRAFT)
+  issuedAt      DateTime?
+  pdfFileId     String?
+  version       Int                @default(1)
+  generalAdvice String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  encounter     Encounter          @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  items         PrescriptionItem[]
+
+  @@index([patientId])
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id             String       @id @default(uuid())
+  prescriptionId String
+  medicineName   String
+  dosage         String
+  frequency      String
+  duration       String
+  instructions   String?
+
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  @@map("prescription_items")
+}
+
+enum ScanStatus {
+  PENDING
+  SCANNING
+  CLEAN
+  INFECTED
+  ERROR
+}
+
+model File {
+  id          String     @id @default(uuid())
+  ownerUserId String
+  purpose     String
+  storageKey  String
+  mime        String
+  sizeBytes   Int
+  sha256      String?
+  scanStatus  ScanStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+
+  user        User       @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+
+  @@map("files")
+}
+
+model AiInteraction {
+  id                   String    @id @default(uuid())
+  userId               String
+  appointmentId        String?
+  purpose              String
+  model                String
+  inputRedactionLevel  String    @default("AGGRESSIVE")
+  output               String
+  status               String    @default("DRAFT")
+  reviewedBy           String?
+  reviewedAt           DateTime?
+  createdAt            DateTime  @default(now())
+
+  @@map("ai_interactions")
+}
+
+// -----------------------------------------------------------------------------
+// Payments & Ledger
+// -----------------------------------------------------------------------------
+
+enum PaymentStatus {
+  CREATED
+  PENDING
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  appointmentId     String
+  provider          String        @default("razorpay")
+  providerOrderId   String        @unique
+  providerPaymentId String?
+  amountPaise       Int
+  currency          String        @default("INR")
+  status            PaymentStatus @default(CREATED)
+  idempotencyKey    String?       @unique
+  capturedAt        DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  appointment       Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  refunds           Refund[]
+  ledgerEntries     LedgerEntry[]
+
+  @@index([appointmentId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Refund {
+  id               String        @id @default(uuid())
+  paymentId        String
+  amountPaise      Int
+  reason           String
+  status           String        @default("PENDING")
+  providerRefundId String?       @unique
+  requestedBy      String
+  approvedBy       String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  payment          Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  ledgerEntries    LedgerEntry[]
+
+  @@map("refunds")
+}
+
+enum LedgerAccount {
+  PLATFORM_REVENUE
+  DOCTOR_PAYABLE
+  GATEWAY_FEE
+  REFUND
+  TAX
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+}
+
+model LedgerEntry {
+  id            String          @id @default(uuid())
+  occurredAt    DateTime        @default(now())
+  account       LedgerAccount
+  direction     LedgerDirection
+  amountPaise   Int
+  appointmentId String?
+  paymentId     String?
+  refundId      String?
+  meta          Json?
+
+  payment       Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  refund        Refund?         @relation(fields: [refundId], references: [id], onDelete: SetNull)
+
+  @@index([account, occurredAt])
+  @@index([appointmentId])
+  @@map("ledger_entries")
+}
+
+model Settlement {
+  id              String   @id @default(uuid())
+  doctorId        String
+  period          String
+  grossPaise      Int
+  commissionPaise Int
+  netPaise        Int
+  status          String   @default("PENDING")
+  providerRef     String?
+  createdAt       DateTime @default(now())
+
+  @@map("settlements")
+}
+
+model WebhookEvent {
+  id          String    @id @default(uuid())
+  provider    String
+  eventId     String
+  type        String
+  payload     Json
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+  status      String    @default("RECEIVED")
+  attempts    Int       @default(0)
+
+  @@unique([provider, eventId])
+  @@index([status, receivedAt])
+  @@map("webhook_events")
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(uuid())
+  code        String   @unique // FREE, PREMIUM
+  name        String
+  pricePaise  Int      @default(0)
+  interval    String   @default("MONTHLY")
+  features    Json
+
+  subscriptions DoctorSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model DoctorSubscription {
+  id               String           @id @default(uuid())
+  doctorId         String
+  planId           String
+  status           String           @default("ACTIVE")
+  currentPeriodEnd DateTime?
+  providerSubRef   String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  doctor           DoctorProfile    @relation(fields: [doctorId], references: [userId], onDelete: Cascade)
+  plan             SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_subscriptions")
+}
+
+// -----------------------------------------------------------------------------
+// Operations, Audit & Events
+// -----------------------------------------------------------------------------
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  channel   String   @default("EMAIL")
+  template  String
+  status    String   @default("PENDING")
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  userId    String
+  channel   String
+  eventType String
+  enabled   Boolean @default(true)
+
+  @@id([userId, channel, eventType])
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  at           DateTime @default(now())
+  actorUserId  String?
+  actorRole    String?
+  action       String
+  resourceType String
+  resourceId   String?
+  outcome      String   @default("SUCCESS")
+  ip           String?
+  requestId    String?
+  meta         Json?
+
+  user         User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([resourceType, resourceId, at])
+  @@index([actorUserId, at])
+  @@map("audit_logs")
+}
+
+model OutboxEvent {
+  id           String    @id @default(uuid())
+  aggregate    String
+  type         String
+  payload      Json
+  createdAt    DateTime  @default(now())
+  dispatchedAt DateTime?
+
+  @@index([dispatchedAt, createdAt])
+  @@map("outbox_events")
+}

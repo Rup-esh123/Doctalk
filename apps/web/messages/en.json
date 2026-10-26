@@ -1,0 +1,33 @@
+{
+  "common": {
+    "appName": "DocTALK",
+    "tagline": "Trusted Telemedicine & Managed Healthcare for India",
+    "emergencyBanner": "EMERGENCY NOTICE: If you are experiencing a life-threatening medical emergency, chest pain, or severe breathing distress, immediately dial 112 or 108. DocTALK is not an emergency triage service.",
+    "bookNow": "Book Consultation",
+    "findDoctor": "Find a Doctor",
+    "verified": "Council Verified",
+    "yearsExp": "years exp",
+    "fee": "Consultation Fee"
+  },
+  "nav": {
+    "doctors": "Find Doctors",
+    "specialties": "Specialties",
+    "howItWorks": "How It Works",
+    "safety": "Trust & Safety",
+    "emergency": "Emergency",
+    "doctorLogin": "Doctor Portal",
+    "patientLogin": "Sign In"
+  },
+  "hero": {
+    "badge": "Ministry & Medical Council Standards Aligned",
+    "title": "Quality Healthcare Consultations, From Verified Indian Doctors.",
+    "subtitle": "Connect securely with experienced physicians and specialists via encrypted video, low-bandwidth audio, or clinical chat. Transparent pricing, verified credentials, and digital prescriptions.",
+    "ctaSearch": "Search Doctors",
+    "ctaHowItWorks": "How Consultations Work"
+  },
+  "modes": {
+    "video": "HD Video",
+    "audio": "Audio Only",
+    "chat": "Secure Chat"
+  }
+}
