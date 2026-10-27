@@ -4,8 +4,16 @@ import {
   Body,
   Headers,
   Get,
+  Req,
+  UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PaymentsService } from './payments.service.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { UserRole, ErrorCodes } from '@doctalk/shared';
 
 @Controller('payments')
 export class PaymentsController {
@@ -15,13 +23,25 @@ export class PaymentsController {
   async handleWebhook(
     @Body() body: any,
     @Headers('x-razorpay-signature') signature?: string,
+    @Req() req?: Request,
   ) {
-    const rawBody = typeof body === 'string' ? body : JSON.stringify(body);
-    const sig = signature || 'test-signature';
-    return this.paymentsService.handleRazorpayWebhook(rawBody, sig, body);
+    if (!signature) {
+      throw new BadRequestException({
+        code: ErrorCodes.PAYMENT_SIGNATURE_INVALID,
+        message: 'Missing Razorpay webhook signature header (x-razorpay-signature)',
+      });
+    }
+
+    const rawBody =
+      (req as any)?.rawBody?.toString('utf8') ||
+      (typeof body === 'string' ? body : JSON.stringify(body));
+
+    return this.paymentsService.handleRazorpayWebhook(rawBody, signature, body);
   }
 
   @Get('ledger')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   getLedger() {
     return this.paymentsService.getLedger();
   }

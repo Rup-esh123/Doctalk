@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PaymentProvider, PaymentOrderResult, RefundResult } from './payment.provider.interface.js';
-import { createHmac, randomBytes } from 'crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 import { env } from '../../config/env.js';
 
 @Injectable()
@@ -25,12 +25,22 @@ export class MockPaymentProvider implements PaymentProvider {
   }
 
   verifyWebhookSignature(payloadRaw: string, signature: string): boolean {
-    if (!signature) return false;
-    const expected = createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET)
-      .update(payloadRaw)
-      .digest('hex');
-    // In mock/test mode allow 'test-signature' or exact match
-    return signature === expected || signature === 'test-signature';
+    if (!signature || !payloadRaw) return false;
+    try {
+      const secret = env.RAZORPAY_WEBHOOK_SECRET;
+      if (!secret) return false;
+      const expected = createHmac('sha256', secret)
+        .update(payloadRaw)
+        .digest('hex');
+      const expectedBuffer = Buffer.from(expected, 'hex');
+      const signatureBuffer = Buffer.from(signature, 'hex');
+      if (expectedBuffer.length !== signatureBuffer.length) {
+        return false;
+      }
+      return timingSafeEqual(expectedBuffer, signatureBuffer);
+    } catch {
+      return false;
+    }
   }
 
   async refund(

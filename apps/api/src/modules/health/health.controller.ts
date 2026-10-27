@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 import { env } from '../../config/env.js';
 
@@ -18,13 +18,24 @@ export class HealthController {
 
   @Get('readiness')
   async readiness() {
+    const isDbConnected = Boolean(this.prisma?.isConnected);
+
+    if (!isDbConnected) {
+      throw new ServiceUnavailableException({
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Required dependency unavailable: PostgreSQL database is not connected.',
+        database: 'disconnected',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     return {
       status: 'ready',
       timestamp: new Date().toISOString(),
-      database: this.prisma.isConnected ? 'connected' : 'local_fallback',
+      database: 'connected',
       providers: {
         video: env.VIDEO_PROVIDER,
-        payment: 'razorpay_test',
+        payment: env.PAYMENT_PROVIDER,
         email: env.EMAIL_PROVIDER,
         storage: env.STORAGE_PROVIDER,
         ai: env.FEATURE_AI_INTAKE ? 'active' : 'disabled',

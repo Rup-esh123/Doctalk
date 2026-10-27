@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DoctorSummary, DoctorSearchQuery, Slot, DoctorStatus, ErrorCodes } from '@doctalk/shared';
 import { FICTIONAL_DOCTORS, FICTIONAL_SPECIALTIES, FictionalSpecialty } from './fictional-doctors.data.js';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
@@ -79,7 +79,7 @@ export class DoctorsService {
   }
 
   async getAvailableSlots(doctorId: string, targetDateStr?: string): Promise<Slot[]> {
-    const doctor = await this.getBySlugOrId(doctorId);
+    await this.getBySlugOrId(doctorId);
 
     // Compute slots in doctor's time zone (09:00 to 17:00 IST), 30 min duration
     const baseDate = targetDateStr ? new Date(targetDateStr) : new Date();
@@ -112,5 +112,141 @@ export class DoctorsService {
     }
 
     return slots;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Doctor Onboarding (Authenticated)
+  // ---------------------------------------------------------------------------
+
+  async getOnboardingStatus(userId: string) {
+    const profile = await this.prisma.doctorProfile.findUnique({
+      where: { userId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            phone: true,
+            emailVerifiedAt: true,
+            status: true,
+          },
+        },
+        credentials: true,
+        specialties: { include: { specialty: true } },
+      },
+    });
+
+    if (!profile) {
+      throw new NotFoundException({
+        code: ErrorCodes.DOCTOR_NOT_FOUND,
+        message: 'Doctor profile not found',
+      });
+    }
+
+    const decisions = await this.prisma.verificationDecision.findMany({
+      where: { doctorId: userId },
+      orderBy: { decidedAt: 'desc' },
+      take: 5,
+    });
+
+    return { profile, decisions };
+  }
+
+  async updateOnboardingProfile(
+    userId: string,
+    data: {
+      displayName?: string;
+      bio?: string;
+      yearsExperience?: number;
+      consultationFeePaise?: number;
+      languages?: string[];
+      practiceType?: 'INDEPENDENT' | 'MANAGED';
+      acceptsInstant?: boolean;
+    },
+  ) {
+    const profile = await this.prisma.doctorProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!profile) {
+      throw new NotFoundException({
+        code: ErrorCodes.DOCTOR_NOT_FOUND,
+        message: 'Doctor profile not found',
+      });
+    }
+
+    return this.prisma.doctorProfile.update({
+      where: { userId },
+      data: {
+        ...(data.displayName && { displayName: data.displayName }),
+        ...(data.bio !== undefined && { bio: data.bio }),
+        ...(data.yearsExperience !== undefined && { yearsExperience: data.yearsExperience }),
+        ...(data.consultationFeePaise !== undefined && { consultationFeePaise: data.consultationFeePaise }),
+        ...(data.languages && { languages: data.languages }),
+        ...(data.practiceType && { practiceType: data.practiceType }),
+        ...(data.acceptsInstant !== undefined && { acceptsInstant: data.acceptsInstant }),
+      },
+    });
+  }
+
+  async addCredential(
+    userId: string,
+    data: {
+      type: string;
+      councilName: string;
+      registrationNumber: string;
+      documentFileId?: string;
+    },
+  ) {
+    return this.prisma.doctorCredential.create({
+      data: {
+        doctorId: userId,
+        type: data.type,
+        councilName: data.councilName,
+        registrationNumber: data.registrationNumber,
+        documentFileId: data.documentFileId || null,
+        status: 'SUBMITTED',
+      },
+    });
+  }
+
+  async submitForVerification(userId: string) {
+    const profile = await this.prisma.doctorProfile.findUnique({
+      where: { userId },
+      include: { credentials: true },
+    });
+
+    if (!profile) {
+      throw new NotFoundException({
+        code: ErrorCodes.DOCTOR_NOT_FOUND,
+        message: 'Doctor profile not found',
+      });
+    }
+
+    if (profile.credentials.length === 0) {
+      throw new BadRequestException({
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'Please provide at least one credential before submitting for verification',
+      });
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.doctorProfile.update({
+        where: { userId },
+        data: { status: 'APPLIED' },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actorUserId: userId,
+          actorRole: 'DOCTOR',
+          action: 'DOCTOR_ONBOARDING_SUBMITTED',
+          resourceType: 'DOCTOR_PROFILE',
+          resourceId: userId,
+        },
+      });
+    });
+
+    return { message: 'Application submitted for admin verification' };
   }
 }

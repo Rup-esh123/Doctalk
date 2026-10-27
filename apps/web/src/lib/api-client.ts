@@ -106,11 +106,126 @@ export const apiClient = {
     });
   },
 
+  async verifyMfa(input: { mfaPendingToken: string; totpCode: string }) {
+    return fetcher<any>('/auth/mfa/verify', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  async enrollMfa() {
+    return fetcher<{ secret: string; otpAuthUrl: string; message: string }>('/auth/mfa/enroll', {
+      method: 'POST',
+    });
+  },
+
+  async confirmMfa(totpCode: string) {
+    return fetcher<{ message: string }>('/auth/mfa/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ totpCode }),
+    });
+  },
+
+  async verifyEmail(token: string) {
+    return fetcher<{ message: string }>('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  },
+
+  async resendVerification() {
+    return fetcher<{ message: string }>('/auth/resend-verification', {
+      method: 'POST',
+    });
+  },
+
+  async requestPasswordReset(email: string) {
+    return fetcher<{ message: string }>('/auth/password-reset/request', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async confirmPasswordReset(token: string, newPassword: string) {
+    return fetcher<{ message: string }>('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
   async getMe() {
     return fetcher<any>('/auth/me');
   },
 
   async logout() {
     return fetcher<any>('/auth/logout', { method: 'POST' });
+  },
+
+  // ---------------------------------------------------------------------------
+  // Doctor Onboarding
+  // ---------------------------------------------------------------------------
+
+  async getDoctorOnboarding() {
+    return fetcher<{ profile: any; decisions: any[] }>('/doctors/me/onboarding');
+  },
+
+  async updateDoctorOnboarding(data: any) {
+    return fetcher<any>('/doctors/me/onboarding/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async addDoctorCredential(data: { type: string; councilName: string; registrationNumber: string; documentFileId?: string }) {
+    return fetcher<any>('/doctors/me/onboarding/documents', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async submitDoctorOnboarding() {
+    return fetcher<{ message: string }>('/doctors/me/onboarding/submit', {
+      method: 'POST',
+    });
+  },
+
+  // ---------------------------------------------------------------------------
+  // Admin Verification Portal
+  // ---------------------------------------------------------------------------
+
+  async getAdminApplications(params?: { status?: string; page?: number; limit?: number }) {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.append('status', params.status);
+    if (params?.page) qs.append('page', String(params.page));
+    if (params?.limit) qs.append('limit', String(params.limit));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return fetcher<{ applications: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(
+      `/admin/applications${query}`,
+    );
+  },
+
+  async getAdminApplicationDetail(doctorId: string) {
+    return fetcher<{ profile: any; decisions: any[] }>(`/admin/applications/${doctorId}`);
+  },
+
+  async approveDoctorApplication(doctorId: string, notes?: string) {
+    return fetcher<{ message: string }>(`/admin/applications/${doctorId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    });
+  },
+
+  async rejectDoctorApplication(doctorId: string, reason: string, notes?: string) {
+    return fetcher<{ message: string }>(`/admin/applications/${doctorId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, notes }),
+    });
+  },
+
+  async requestDoctorInfo(doctorId: string, reason: string) {
+    return fetcher<{ message: string }>(`/admin/applications/${doctorId}/request-info`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
   },
 };

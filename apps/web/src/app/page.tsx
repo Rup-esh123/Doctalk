@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { DoctorCard } from '../components/doctor/DoctorCard';
 import { BookingModal } from '../components/doctor/BookingModal';
@@ -179,7 +179,7 @@ export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   // Fetch doctors from backend with current filters
-  const fetchDoctors = () => {
+  const fetchDoctors = useCallback(() => {
     setLoading(true);
     apiClient
       .getDoctors({
@@ -210,11 +210,11 @@ export default function HomePage() {
         setDoctors(list);
       })
       .finally(() => setLoading(false));
-  };
+  }, [searchTerm, selectedSpecialty, selectedLanguage, selectedPracticeType, selectedMode]);
 
   useEffect(() => {
     fetchDoctors();
-  }, [selectedSpecialty, selectedLanguage, selectedPracticeType, selectedMode]);
+  }, [fetchDoctors]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

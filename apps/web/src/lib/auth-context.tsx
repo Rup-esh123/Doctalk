@@ -12,8 +12,10 @@ interface AuthContextValue {
   isDoctor: boolean;
   isPatient: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<{ mfaRequired: boolean }>;
+  login: (email: string, password: string) => Promise<{ mfaRequired: boolean; mfaPendingToken?: string }>;
+  verifyMfa: (totpCode: string) => Promise<void>;
   registerPatient: (fullName: string, email: string, password: string, phone?: string) => Promise<void>;
+  registerDoctor: (input: any) => Promise<any>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -50,7 +52,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const result = await apiClient.login({ email, password });
     if (result.mfaRequired) {
-      return { mfaRequired: true };
+      if (typeof window !== 'undefined' && result.mfaPendingToken) {
+        sessionStorage.setItem('doctalk_mfa_pending', result.mfaPendingToken);
+      }
+      return { mfaRequired: true, mfaPendingToken: result.mfaPendingToken };
     }
     if (result.user) {
       const authUser = result.user as AuthUser;
@@ -58,6 +63,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       storeUser(authUser);
     }
     return { mfaRequired: false };
+  }, []);
+
+  const verifyMfa = useCallback(async (totpCode: string) => {
+    const pendingToken = typeof window !== 'undefined' ? sessionStorage.getItem('doctalk_mfa_pending') : null;
+    if (!pendingToken) {
+      throw new Error('MFA session expired. Please log in again.');
+    }
+    const result = await apiClient.verifyMfa({ mfaPendingToken: pendingToken, totpCode });
+    if (result.user) {
+      const authUser = result.user as AuthUser;
+      setUser(authUser);
+      storeUser(authUser);
+    }
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('doctalk_mfa_pending');
+    }
   }, []);
 
   const registerPatient = useCallback(async (
@@ -72,6 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(authUser);
       storeUser(authUser);
     }
+  }, []);
+
+  const registerDoctor = useCallback(async (input: any) => {
+    return apiClient.registerDoctor(input);
   }, []);
 
   const logout = useCallback(async () => {
@@ -103,7 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isPatient: user?.role === UserRole.PATIENT,
     isAdmin: user?.role === UserRole.ADMIN,
     login,
+    verifyMfa,
     registerPatient,
+    registerDoctor,
     logout,
     refreshUser,
   };
@@ -114,7 +141,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
+    return {
+      user: null,
+      isLoading: false,
+      isAuthenticated: false,
+      isDoctor: false,
+      isPatient: false,
+      isAdmin: false,
+      login: async () => ({ mfaRequired: false }),
+      verifyMfa: async () => {},
+      registerPatient: async () => {},
+      registerDoctor: async () => ({}),
+      logout: async () => {},
+      refreshUser: async () => {},
+    };
   }
   return ctx;
 }

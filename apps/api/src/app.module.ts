@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { DoctorsModule } from './modules/doctors/doctors.module.js';
 import { AppointmentsModule } from './modules/appointments/appointments.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware.js';
 
 @Module({
@@ -24,6 +25,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware.j
     DoctorsModule,
     AppointmentsModule,
     PaymentsModule,
+    AdminModule,
   ],
 })
 export class AppModule implements NestModule {

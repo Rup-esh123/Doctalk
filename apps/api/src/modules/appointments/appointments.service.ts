@@ -13,7 +13,6 @@ import {
   ErrorCodes,
   CreateAppointmentInput,
   canTransitionAppointment,
-  calculateCommission,
   paiseToRupees,
 } from '@doctalk/shared';
 import { DoctorsService } from '../doctors/doctors.service.js';
@@ -101,7 +100,6 @@ export class AppointmentsService {
     // 4. Snapshots: fee, commission (15% independent, 25% managed), policy version
     const feePaise = doctor.consultationFeePaise;
     const commissionBps = doctor.practiceType === 'MANAGED' ? 2500 : 1500;
-    const { commissionPaise, doctorPayablePaise } = calculateCommission(feePaise, commissionBps);
 
     const appointmentId = randomUUID();
     const holdExpiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minute hold

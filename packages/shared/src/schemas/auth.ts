@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { UserRole } from '../enums/index.js';
 
 export const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

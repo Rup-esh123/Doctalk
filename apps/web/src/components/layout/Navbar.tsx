@@ -13,14 +13,7 @@ import {
   LogIn,
   LayoutDashboard,
 } from 'lucide-react';
-
-// Optional auth — Navbar is used on both auth and non-auth pages
-let useAuthSafe: (() => { user: any; isAuthenticated: boolean }) | null = null;
-try {
-  // Dynamic import avoids crash when AuthProvider is not present
-  const { useAuth } = require('../../lib/auth-context');
-  useAuthSafe = useAuth;
-} catch { /* auth not available */ }
+import { useAuth } from '@/lib/auth-context';
 
 interface NavbarProps {
   onOpenBooking?: () => void;
@@ -29,16 +22,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenDeviceCheck }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Auth state — graceful fallback when AuthProvider is absent
-  let isAuthenticated = false;
-  let user: any = null;
-  try {
-    if (useAuthSafe) {
-      const authState = useAuthSafe();
-      isAuthenticated = authState.isAuthenticated;
-      user = authState.user;
-    }
-  } catch { /* no auth context */ }
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">

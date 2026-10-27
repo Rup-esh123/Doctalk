@@ -9,6 +9,7 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, {
+    rawBody: true,
     bufferLogs: true,
   });
 
@@ -25,7 +26,8 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key', 'x-request-id', 'x-razorpay-signature'],
   });
 
-  app.use(cookieParser());
+  const cookieMiddleware = typeof cookieParser === 'function' ? cookieParser : (cookieParser as any)?.default;
+  app.use(cookieMiddleware());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new LoggingInterceptor());
 

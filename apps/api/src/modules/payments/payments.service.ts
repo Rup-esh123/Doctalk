@@ -66,6 +66,32 @@ export class PaymentsService {
       const amountPaise = paymentEntity?.amount || 50000;
 
       if (appointmentId) {
+        // Fetch appointment to validate existence and fee
+        const appt = await this.appointmentsService.getById(appointmentId);
+
+        // Server-side validation of payment state & captured status
+        const isCapturedOrPaid =
+          paymentEntity?.status === 'captured' ||
+          paymentEntity?.status === 'paid' ||
+          paymentEntity?.captured === true ||
+          eventType === 'order.paid';
+
+        if (!isCapturedOrPaid) {
+          this.logger.warn(`[Payments] Payment entity for appointment ${appointmentId} is not captured or paid`);
+          throw new BadRequestException({
+            code: ErrorCodes.VALIDATION_ERROR,
+            message: 'Payment has not been captured or paid',
+          });
+        }
+
+        if (amountPaise < appt.feePaise) {
+          this.logger.warn(`[Payments] Amount mismatch for appointment ${appointmentId}: expected ${appt.feePaise}, got ${amountPaise}`);
+          throw new BadRequestException({
+            code: ErrorCodes.VALIDATION_ERROR,
+            message: 'Payment amount mismatch: captured amount is less than consultation fee',
+          });
+        }
+
         // Transition appointment HELD -> CONFIRMED
         await this.appointmentsService.confirmByPayment(appointmentId, paymentId);
 

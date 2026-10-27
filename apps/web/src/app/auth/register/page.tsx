@@ -113,7 +113,7 @@ export default function PatientRegisterPage() {
 
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Shield className="w-3.5 h-3.5" />
-          <span>Protected under India's Digital Personal Data Protection Act</span>
+          <span>Protected under India&apos;s Digital Personal Data Protection Act</span>
         </div>
       </div>
 
@@ -286,13 +286,13 @@ export default function PatientRegisterPage() {
                 className="mt-0.5 w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
               />
               <label htmlFor="reg-consent" className="text-[11px] text-slate-500 leading-relaxed">
-                I agree to DocTALK's{' '}
+                I agree to DocTALK&apos;s{' '}
                 <a href="#" className="text-teal-700 underline font-medium">Terms of Service</a>
                 ,{' '}
                 <a href="#" className="text-teal-700 underline font-medium">Privacy Policy</a>
                 , and{' '}
                 <a href="#" className="text-teal-700 underline font-medium">Telemedicine Consent</a>.
-                I understand that my health data will be encrypted and processed per India's DPDPA.
+                I understand that my health data will be encrypted and processed per India&apos;s DPDPA.
               </label>
             </div>
 

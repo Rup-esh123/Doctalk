@@ -20,7 +20,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading, isAuthenticated, logout, isDoctor, isPatient, isAdmin } = useAuth();
@@ -68,7 +68,7 @@ export default function DashboardPage() {
         { icon: User, label: 'My Profile', href: '/doctor/profile', desc: 'Update your public profile', color: 'text-violet-600', bg: 'bg-violet-50' },
       ]
     : [
-        { icon: ShieldCheck, label: 'Verification Queue', href: '/admin/verify', desc: 'Review pending doctor applications', color: 'text-teal-600', bg: 'bg-teal-50' },
+        { icon: ShieldCheck, label: 'Verification Queue', href: '/admin/verification', desc: 'Review pending doctor applications', color: 'text-teal-600', bg: 'bg-teal-50' },
         { icon: FileText, label: 'Audit Logs', href: '/admin/audit', desc: 'System audit trail', color: 'text-blue-600', bg: 'bg-blue-50' },
         { icon: Settings, label: 'Platform Config', href: '/admin/config', desc: 'Policies and feature flags', color: 'text-indigo-600', bg: 'bg-indigo-50' },
         { icon: MessageSquare, label: 'Dispute Resolution', href: '/admin/disputes', desc: 'Handle refund exceptions', color: 'text-violet-600', bg: 'bg-violet-50' },
@@ -116,6 +116,20 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-base font-extrabold">Welcome to DocTALK, {user.displayName.split(' ')[0]}!</h2>
               <p className="text-xs text-teal-100 mt-0.5">Your account is active. You can now book consultations with verified doctors.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Doctor Verification Status Banner */}
+        {isDoctor && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-3.5">
+            <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-bold text-amber-900">Application Under Verification</h3>
+              <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                Your medical council credentials are being reviewed by our clinical onboarding team per NMC guidelines.
+                Consultations will be published as soon as your state council registration is verified.
+              </p>
             </div>
           </div>
         )}
@@ -217,5 +231,22 @@ export default function DashboardPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="text-center space-y-3">
+            <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
+            <p className="text-sm text-slate-500">Loading your dashboard…</p>
+          </div>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </React.Suspense>
   );
 }

@@ -68,7 +68,7 @@ export default function LoginPage() {
 
           <div className="mt-16 space-y-4">
             <h2 className="text-3xl font-extrabold leading-snug">
-              India's Most Trusted<br />
+              India&apos;s Most Trusted<br />
               <span className="text-teal-400">Telemedicine Platform</span>
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed max-w-xs">
@@ -119,10 +119,9 @@ export default function LoginPage() {
 
           {/* Demo Credentials Banner */}
           <div className="mb-6 p-3.5 rounded-xl bg-blue-50 border border-blue-200">
-            <p className="text-xs font-bold text-blue-800 mb-1">🧪 Development Demo Accounts</p>
+            <p className="text-xs font-bold text-blue-800 mb-1">🧪 Development Demo Account</p>
             <div className="text-xs text-blue-700 space-y-0.5 font-mono">
               <p>Patient: patient@doctalk.in / DocTalkPatient@2026</p>
-              <p>Admin: admin@doctalk.in / DocTalkAdmin@2026</p>
             </div>
           </div>
 
@@ -237,11 +236,11 @@ export default function LoginPage() {
 
           <div className="mt-8 pt-6 border-t border-slate-200">
             <p className="text-[11px] text-slate-400 text-center leading-relaxed">
-              By signing in, you agree to DocTALK's{' '}
+              By signing in, you agree to DocTALK&apos;s{' '}
               <a href="#" className="underline hover:text-slate-600">Terms of Service</a>
               {' '}and{' '}
               <a href="#" className="underline hover:text-slate-600">Privacy Policy</a>.
-              Your health data is encrypted and protected under India's DPDPA.
+              Your health data is encrypted and protected under India&apos;s DPDPA.
             </p>
           </div>
         </div>
