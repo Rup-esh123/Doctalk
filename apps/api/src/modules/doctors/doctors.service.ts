@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { DoctorSummary, DoctorSearchQuery, Slot, DoctorStatus, ErrorCodes } from '@doctalk/shared';
 import { FICTIONAL_DOCTORS, FICTIONAL_SPECIALTIES, FictionalSpecialty } from './fictional-doctors.data.js';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 
 @Injectable()
 export class DoctorsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async getSpecialties(): Promise<FictionalSpecialty[]> {
     return FICTIONAL_SPECIALTIES;

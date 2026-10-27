@@ -9,6 +9,7 @@ import {
   Req,
   UnauthorizedException,
   ForbiddenException,
+  Inject,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service.js';
 import {
@@ -22,7 +23,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 
 @Controller('appointments')
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(@Inject(AppointmentsService) private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)

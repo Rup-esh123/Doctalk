@@ -45,7 +45,7 @@ export class AppointmentsService {
   private idempotencyStore: Map<string, any> = new Map();
 
   constructor(
-    private readonly doctorsService: DoctorsService,
+    @Inject(DoctorsService) private readonly doctorsService: DoctorsService,
     @Inject(PAYMENT_PROVIDER_TOKEN) private readonly paymentProvider: PaymentProvider,
   ) {}
 

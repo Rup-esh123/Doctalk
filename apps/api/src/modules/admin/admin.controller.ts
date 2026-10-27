@@ -6,6 +6,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { AdminService } from './admin.service.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
@@ -18,7 +19,7 @@ import { UserRole } from '@doctalk/shared';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(@Inject(AdminService) private readonly adminService: AdminService) {}
 
   @Get('applications')
   async listApplications(

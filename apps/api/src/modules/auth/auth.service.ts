@@ -46,8 +46,8 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
     @Inject(EMAIL_PROVIDER_TOKEN) private readonly emailProvider: EmailProvider,
   ) {}
 

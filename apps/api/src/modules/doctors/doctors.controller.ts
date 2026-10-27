@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Query, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Query, Body, UseGuards, Inject } from '@nestjs/common';
 import { DoctorsService } from './doctors.service.js';
 import { doctorSearchQuerySchema, UserRole } from '@doctalk/shared';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
@@ -8,7 +8,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 
 @Controller('doctors')
 export class DoctorsController {
-  constructor(private readonly doctorsService: DoctorsService) {}
+  constructor(@Inject(DoctorsService) private readonly doctorsService: DoctorsService) {}
 
   @Get()
   async search(@Query() rawQuery: Record<string, any>) {

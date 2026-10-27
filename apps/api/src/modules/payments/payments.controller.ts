@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PaymentsService } from './payments.service.js';
@@ -17,7 +18,7 @@ import { UserRole, ErrorCodes } from '@doctalk/shared';
 
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(@Inject(PaymentsService) private readonly paymentsService: PaymentsService) {}
 
   @Post('webhook')
   async handleWebhook(

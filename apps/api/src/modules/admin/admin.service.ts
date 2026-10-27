@@ -16,7 +16,7 @@ export class AdminService {
   private readonly logger = new Logger(AdminService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(EMAIL_PROVIDER_TOKEN) private readonly emailProvider: EmailProvider,
   ) {}
 

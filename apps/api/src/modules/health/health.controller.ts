@@ -1,10 +1,10 @@
-import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { Controller, Get, ServiceUnavailableException, Inject } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 import { env } from '../../config/env.js';
 
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   @Get('liveness')
   liveness() {
@@ -18,7 +18,7 @@ export class HealthController {
 
   @Get('readiness')
   async readiness() {
-    const isDbConnected = Boolean(this.prisma?.isConnected);
+    const isDbConnected = await this.prisma.checkHealth();
 
     if (!isDbConnected) {
       throw new ServiceUnavailableException({
