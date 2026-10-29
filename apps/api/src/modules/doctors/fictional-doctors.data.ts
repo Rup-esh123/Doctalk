@@ -1,4 +1,4 @@
-import { DoctorSummary, PracticeType, DoctorStatus } from '@doctalk/shared';
+import { DoctorSummary, PracticeType, DoctorStatus } from '../../shared';
 
 export interface FictionalSpecialty {
   id: string;

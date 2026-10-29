@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AppointmentKind, ConsultationMode } from '../enums/index.js';
+import { AppointmentKind, ConsultationMode } from '../enums';
 
 export const createAppointmentSchema = z.object({
   doctorId: z.string().uuid('Invalid doctor ID'),

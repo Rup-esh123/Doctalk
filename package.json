@@ -4,19 +4,31 @@
   "private": true,
   "description": "DocTALK Telemedicine Marketplace and Managed Clinic Platform",
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "typecheck": "turbo typecheck",
+    "postinstall": "npm run install:all",
+    "install:all": "npm --prefix apps/api install && npm --prefix apps/web install",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"API,WEB\" -c \"blue,green\" \"npm --prefix apps/api run dev\" \"npm --prefix apps/web run dev\"",
+    "dev:api": "npm --prefix apps/api run dev",
+    "dev:web": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/api run build && npm --prefix apps/web run build",
+    "build:api": "npm --prefix apps/api run build",
+    "build:web": "npm --prefix apps/web run build",
+    "start:api": "npm --prefix apps/api run start",
+    "start:web": "npm --prefix apps/web run start",
+    "lint": "npm --prefix apps/api run lint && npm --prefix apps/web run lint",
+    "lint:api": "npm --prefix apps/api run lint",
+    "lint:web": "npm --prefix apps/web run lint",
+    "test": "npm --prefix apps/api run test && npm --prefix apps/web run test",
+    "test:api": "npm --prefix apps/api run test",
+    "test:web": "npm --prefix apps/web run test",
+    "typecheck": "npm --prefix apps/api run typecheck && npm --prefix apps/web run typecheck",
+    "typecheck:api": "npm --prefix apps/api run typecheck",
+    "typecheck:web": "npm --prefix apps/web run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "turbo": "^2.1.3",
-    "typescript": "^5.5.4"
+    "concurrently": "^9.1.2",
+    "prettier": "^3.3.3"
   },
-  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=20.0.0"
   }

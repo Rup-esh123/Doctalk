@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
-import { UserRole } from '@doctalk/shared';
+import { UserRole } from '../../shared';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)

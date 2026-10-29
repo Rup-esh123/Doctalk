@@ -7,7 +7,7 @@ import {
   AppointmentKind,
   formatINR,
   Slot,
-} from '@doctalk/shared';
+} from '@/shared';
 import {
   X,
   Calendar,

@@ -1,4 +1,4 @@
-import { AppointmentStatus } from '../enums/index.js';
+import { AppointmentStatus } from '../enums';
 
 export const VALID_APPOINTMENT_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
   [AppointmentStatus.HELD]: [

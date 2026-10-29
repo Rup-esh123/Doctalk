@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ErrorCodes, ApiErrorResponse } from '@doctalk/shared';
+import { ErrorCodes, ApiErrorResponse } from '../../shared';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

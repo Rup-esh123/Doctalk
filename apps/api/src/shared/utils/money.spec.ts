@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { paiseToRupees, rupeesToPaise, formatINR, calculateCommission } from './money.js';
+import { paiseToRupees, rupeesToPaise, formatINR, calculateCommission } from './money';
 
 describe('Money Utilities (Integer Paise Integrity)', () => {
   it('converts paise to rupees accurately without float error', () => {

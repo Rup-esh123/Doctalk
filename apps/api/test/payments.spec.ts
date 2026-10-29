@@ -6,7 +6,7 @@ import { MockPaymentProvider } from '../src/providers/payment/mock-payment.provi
 import { PrismaService } from '../src/common/prisma/prisma.service.js';
 import { env } from '../src/config/env.js';
 import { createHmac } from 'crypto';
-import { ConsultationMode, AppointmentKind, AppointmentStatus } from '@doctalk/shared';
+import { ConsultationMode, AppointmentKind, AppointmentStatus } from '../src/shared';
 
 describe('Payment Webhook Verification & Processing', () => {
   let paymentsService: PaymentsService;

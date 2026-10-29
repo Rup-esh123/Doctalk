@@ -7,7 +7,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
-import { ErrorCodes, DoctorStatus } from '@doctalk/shared';
+import { ErrorCodes, DoctorStatus } from '../../shared';
 import { EMAIL_PROVIDER_TOKEN } from '../../providers/email/email.provider.interface.js';
 import type { EmailProvider } from '../../providers/email/email.provider.interface.js';
 

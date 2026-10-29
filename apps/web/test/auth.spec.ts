@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { getStoredUser, storeUser, clearUser, AuthUser } from '../src/lib/auth-store';
-import { patientRegisterSchema, doctorRegisterSchema } from '@doctalk/shared';
+import { patientRegisterSchema, doctorRegisterSchema } from '../src/shared';
 
 // Polyfill window & localStorage in Node test environment
 const storageMock = (() => {

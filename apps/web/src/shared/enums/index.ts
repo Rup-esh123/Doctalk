@@ -1,0 +1,127 @@
+export enum UserRole {
+  PATIENT = 'PATIENT',
+  DOCTOR = 'DOCTOR',
+  ADMIN = 'ADMIN',
+  SUPPORT = 'SUPPORT',
+}
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+  SUSPENDED = 'SUSPENDED',
+  DEACTIVATED = 'DEACTIVATED',
+}
+
+export enum PracticeType {
+  INDEPENDENT = 'INDEPENDENT',
+  MANAGED = 'MANAGED',
+}
+
+export enum DoctorStatus {
+  APPLIED = 'APPLIED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum CredentialType {
+  MEDICAL_REGISTRATION = 'MEDICAL_REGISTRATION',
+  DEGREE_CERTIFICATE = 'DEGREE_CERTIFICATE',
+  ID_PROOF = 'ID_PROOF',
+}
+
+export enum CredentialStatus {
+  SUBMITTED = 'SUBMITTED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+  NEEDS_INFO = 'NEEDS_INFO',
+  EXPIRING = 'EXPIRING',
+  EXPIRED = 'EXPIRED',
+}
+
+export enum AppointmentKind {
+  SCHEDULED = 'SCHEDULED',
+  INSTANT = 'INSTANT',
+}
+
+export enum ConsultationMode {
+  VIDEO = 'VIDEO',
+  AUDIO = 'AUDIO',
+  CHAT = 'CHAT',
+}
+
+export enum AppointmentStatus {
+  HELD = 'HELD',
+  CONFIRMED = 'CONFIRMED',
+  READY = 'READY',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED_BY_PATIENT = 'CANCELLED_BY_PATIENT',
+  CANCELLED_BY_DOCTOR = 'CANCELLED_BY_DOCTOR',
+  CANCELLED_BY_ADMIN = 'CANCELLED_BY_ADMIN',
+  NO_SHOW_PATIENT = 'NO_SHOW_PATIENT',
+  NO_SHOW_DOCTOR = 'NO_SHOW_DOCTOR',
+  EXPIRED = 'EXPIRED',
+}
+
+export enum InstantRequestStatus {
+  REQUESTED = 'REQUESTED',
+  OFFERED = 'OFFERED',
+  ACCEPTED = 'ACCEPTED',
+  PAYMENT_PENDING = 'PAYMENT_PENDING',
+  CONFIRMED = 'CONFIRMED',
+  QUEUED = 'QUEUED',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum PaymentStatus {
+  CREATED = 'CREATED',
+  PENDING = 'PENDING',
+  CAPTURED = 'CAPTURED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+  PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED',
+}
+
+export enum RefundStatus {
+  PENDING = 'PENDING',
+  PROCESSED = 'PROCESSED',
+  FAILED = 'FAILED',
+}
+
+export enum LedgerAccount {
+  PLATFORM_REVENUE = 'PLATFORM_REVENUE',
+  DOCTOR_PAYABLE = 'DOCTOR_PAYABLE',
+  GATEWAY_FEE = 'GATEWAY_FEE',
+  REFUND = 'REFUND',
+  TAX = 'TAX',
+}
+
+export enum LedgerDirection {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+}
+
+export enum PrescriptionStatus {
+  DRAFT = 'DRAFT',
+  ISSUED = 'ISSUED',
+  AMENDED = 'AMENDED',
+  REVOKED = 'REVOKED',
+}
+
+export enum ScanStatus {
+  PENDING = 'PENDING',
+  SCANNING = 'SCANNING',
+  CLEAN = 'CLEAN',
+  INFECTED = 'INFECTED',
+  ERROR = 'ERROR',
+}
+
+export enum AiInteractionStatus {
+  DRAFT = 'DRAFT',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}

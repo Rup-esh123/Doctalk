@@ -14,7 +14,7 @@ import { PaymentsService } from './payments.service.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
-import { UserRole, ErrorCodes } from '@doctalk/shared';
+import { UserRole, ErrorCodes } from '../../shared';
 
 @Controller('payments')
 export class PaymentsController {

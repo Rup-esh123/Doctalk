@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
-import { DoctorSummary, DoctorSearchQuery, Slot, DoctorStatus, ErrorCodes } from '@doctalk/shared';
+import { DoctorSummary, DoctorSearchQuery, Slot, DoctorStatus, ErrorCodes } from '../../shared';
 import { FICTIONAL_DOCTORS, FICTIONAL_SPECIALTIES, FictionalSpecialty } from './fictional-doctors.data.js';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 

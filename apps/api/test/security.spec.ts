@@ -5,7 +5,7 @@ import { AppointmentsService } from '../src/modules/appointments/appointments.se
 import { DoctorsService } from '../src/modules/doctors/doctors.service.js';
 import { MockPaymentProvider } from '../src/providers/payment/mock-payment.provider.js';
 import { PrismaService } from '../src/common/prisma/prisma.service.js';
-import { ConsultationMode, AppointmentKind, UserRole } from '@doctalk/shared';
+import { ConsultationMode, AppointmentKind, UserRole } from '../src/shared';
 
 describe('Security & Authorization Regression Suite', () => {
   describe('Production Environment Guardrails', () => {

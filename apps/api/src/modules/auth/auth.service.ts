@@ -16,7 +16,7 @@ import {
   DoctorRegisterInput,
   MfaVerifyInput,
   UserSessionPayload,
-} from '@doctalk/shared';
+} from '../../shared';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 import {
   hashPassword,

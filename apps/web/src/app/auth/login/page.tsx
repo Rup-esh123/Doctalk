@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '@doctalk/shared';
+import { loginSchema } from '@/shared';
 import { useAuth } from '../../../lib/auth-context';
 import { Stethoscope, Eye, EyeOff, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ConsultationMode, PracticeType } from '../enums/index.js';
+import { ConsultationMode, PracticeType } from '../enums';
 
 export const doctorSearchQuerySchema = z.object({
   specialty: z.string().optional(),

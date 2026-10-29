@@ -2,7 +2,7 @@
 
 [![DocTALK CI Quality Pipeline](https://github.com/doctalk/doctalk/actions/workflows/ci.yml/badge.svg)](https://github.com/doctalk/doctalk/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-12.x-orange.svg)](https://pnpm.io/)
+[![npm](https://img.shields.io/badge/npm-10.x%20%7C%2011.x-red.svg)](https://www.npmjs.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.x-black.svg)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-10.x-red.svg)](https://nestjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
@@ -11,27 +11,24 @@ DocTALK is a hybrid telemedicine marketplace and managed-clinic network for Indi
 
 ---
 
-## 1. System Architecture & Monorepo Structure
+## 1. System Architecture & Project Structure
+
+DocTALK is organized as two standalone, independent applications with shared domain schemas:
 
 ```
 doctalk/
 ├── apps/
 │   ├── web/                     # Next.js 14 App Router, React 18, Tailwind CSS, TypeScript
+│   │   └── src/shared/          # Self-contained Zod schemas, domain types, enums, integer-paise utils
 │   └── api/                     # NestJS modular REST API & Socket.IO gateway (/v1)
-├── packages/
-│   └── shared/                  # Zod validation schemas, domain types, enums, integer-paise utilities
+│       └── src/shared/          # Self-contained Zod schemas, domain types, enums, integer-paise utils
 ├── docs/                        # Architecture, plans, execution traces, audit checklists
 │   ├── architecture.md          # Primary system architecture specification
 │   ├── plan.md                  # P0–P8 implementation roadmap
 │   ├── progress.md              # Live implementation tracker
 │   ├── flow.md                  # Execution traces for critical journeys
-│   ├── decisions.md             # Decision records (D-001...D-039)
-│   ├── handoff.md               # Session continuity notes
-│   ├── test-checklists.md       # Verifiable quality and test evidence
-│   └── rollback.md              # Rollback and disaster recovery runbooks
+│   └── decisions.md             # Decision records (D-001...D-039)
 ├── docker-compose.yml           # PostgreSQL 16, Redis 7, MinIO (S3), Mailpit (Email)
-├── turbo.json                   # Turborepo task orchestrator
-├── pnpm-workspace.yaml          # Monorepo workspace configuration
 ├── .env.example                 # Comprehensive environment variable template
 └── README.md
 ```
@@ -41,7 +38,7 @@ doctalk/
 ## 2. Prerequisites
 
 - **Node.js**: `v20.x` or `v22.x` (LTS)
-- **pnpm**: `v9.x` or `v12.x` (`npm install -g pnpm`)
+- **npm**: `v10.x` or `v11.x` (bundled with Node.js)
 - **Docker & Docker Compose** (Optional for local PostgreSQL, Redis, MinIO, Mailpit services)
 
 ---
@@ -56,7 +53,8 @@ doctalk/
 
 2. **Install all dependencies:**
    ```bash
-   pnpm install
+   npm install
+   npm run install:all
    ```
 
 3. **Configure Environment:**
@@ -66,7 +64,7 @@ doctalk/
 
 4. **Generate Prisma Client:**
    ```bash
-   pnpm --filter @doctalk/api prisma:generate
+   npm --prefix apps/api run prisma:generate
    ```
 
 5. **Start Infrastructure Services (if Docker is installed):**
@@ -79,10 +77,22 @@ doctalk/
 
 ## 4. Development & Running Locally
 
-Start both the Next.js frontend and NestJS API concurrently via Turborepo:
+Start both the Next.js frontend and NestJS API concurrently from the root:
 
 ```bash
-pnpm dev
+npm run dev
+```
+
+Or run either application independently:
+
+```bash
+# Run API alone
+npm run dev:api
+# Or: cd apps/api && npm run dev
+
+# Run Web alone
+npm run dev:web
+# Or: cd apps/web && npm run dev
 ```
 
 - **DocTALK Web Application**: `http://localhost:3000`
@@ -96,20 +106,20 @@ pnpm dev
 
 ## 5. Verification & Testing Pipeline
 
-Run all quality checks across all workspaces:
+Run all quality checks across both applications:
 
 ```bash
-# 1. Typecheck TypeScript strict mode across all workspaces
-pnpm typecheck
+# 1. Typecheck TypeScript strict mode across both apps
+npm run typecheck
 
 # 2. Run unit and integration tests (Vitest)
-pnpm test
+npm run test
 
 # 3. Lint check
-pnpm lint
+npm run lint
 
-# 4. Production build test (Turborepo)
-pnpm build
+# 4. Production build test
+npm run build
 ```
 
 ---
@@ -118,10 +128,10 @@ pnpm build
 
 | Component | Status | Implementation Details |
 |---|---|---|
-| **P0 Monorepo & Pipeline** | ✅ **Complete** | Turborepo, pnpm workspaces, GitHub Actions CI, strict TypeScript |
+| **Pipeline & Setup** | ✅ **Complete** | Standard npm scripts, GitHub Actions CI, strict TypeScript |
 | **Landing Page & UI** | ✅ **Complete** | Responsive healthcare design, council verification badges, search filters |
 | **API Architecture** | ✅ **Complete** | `/v1` prefix, RequestId middleware, HttpExceptionFilter, Zod pipes |
-| **Shared Package** | ✅ **Complete** | `@doctalk/shared` with Zod schemas, enums, integer-paise calculations |
+| **Shared Models** | ✅ **Complete** | Self-contained Zod schemas, enums, integer-paise calculations |
 | **Double-Booking Protection** | ✅ **Complete** | GiST exclusion logic & 10-minute slot hold state machine |
 | **Provider Abstractions** | ✅ **Complete** | Interfaces & dev adapters for Video, Razorpay, Storage, Email, AI |
 | **Financial Integrity** | ✅ **Complete** | Append-only double-entry ledger tracking paise, 100%/50% refund policies |

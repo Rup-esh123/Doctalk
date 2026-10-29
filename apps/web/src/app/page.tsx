@@ -12,7 +12,7 @@ import {
   ConsultationMode,
   DoctorStatus,
   formatINR,
-} from '@doctalk/shared';
+} from '@/shared';
 import { apiClient } from '../lib/api-client';
 import {
   Search,

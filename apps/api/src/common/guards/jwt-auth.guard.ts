@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { env } from '../../config/env.js';
-import { ErrorCodes } from '@doctalk/shared';
+import { ErrorCodes } from '../../shared';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

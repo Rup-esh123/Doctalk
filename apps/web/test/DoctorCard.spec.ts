@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatINR, PracticeType, DoctorStatus } from '@doctalk/shared';
+import { formatINR, PracticeType, DoctorStatus } from '../src/shared';
 
 describe('DoctorCard Component Logic & Formatting', () => {
   it('formats consultation fee correctly in INR', () => {

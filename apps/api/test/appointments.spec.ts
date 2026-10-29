@@ -3,7 +3,7 @@ import { AppointmentsService } from '../src/modules/appointments/appointments.se
 import { DoctorsService } from '../src/modules/doctors/doctors.service.js';
 import { MockPaymentProvider } from '../src/providers/payment/mock-payment.provider.js';
 import { PrismaService } from '../src/common/prisma/prisma.service.js';
-import { ConsultationMode, AppointmentKind } from '@doctalk/shared';
+import { ConsultationMode, AppointmentKind } from '../src/shared';
 
 describe('AppointmentsService', () => {
   let service: AppointmentsService;

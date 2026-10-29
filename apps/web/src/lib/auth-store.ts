@@ -7,7 +7,7 @@
  * Source of truth for authorization is always the server (cookie verification).
  */
 
-import { UserRole } from '@doctalk/shared';
+import { UserRole } from '@/shared';
 
 export interface AuthUser {
   id: string;

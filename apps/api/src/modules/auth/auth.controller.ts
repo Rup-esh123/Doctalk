@@ -19,7 +19,7 @@ import {
   passwordResetRequestSchema,
   passwordResetConfirmSchema,
   ErrorCodes,
-} from '@doctalk/shared';
+} from '../../shared';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { env } from '../../config/env.js';

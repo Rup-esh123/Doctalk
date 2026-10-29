@@ -14,7 +14,7 @@ import {
   CreateAppointmentInput,
   canTransitionAppointment,
   paiseToRupees,
-} from '@doctalk/shared';
+} from '../../shared';
 import { DoctorsService } from '../doctors/doctors.service.js';
 import { PAYMENT_PROVIDER_TOKEN, PaymentProvider } from '../../providers/payment/payment.provider.interface.js';
 import { randomUUID } from 'crypto';

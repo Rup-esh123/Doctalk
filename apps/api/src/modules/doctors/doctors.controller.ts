@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Param, Query, Body, UseGuards, Inject } from '@nestjs/common';
 import { DoctorsService } from './doctors.service.js';
-import { doctorSearchQuerySchema, UserRole } from '@doctalk/shared';
+import { doctorSearchQuerySchema, UserRole } from '../../shared';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';

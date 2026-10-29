@@ -10,7 +10,7 @@ import {
 import { AuthService } from '../src/modules/auth/auth.service.js';
 import { AdminService } from '../src/modules/admin/admin.service.js';
 import { OTP } from 'otplib';
-import { UserRole, DoctorStatus } from '@doctalk/shared';
+import { UserRole, DoctorStatus } from '../src/shared';
 
 describe('P1 Identity & Authentication Suite', () => {
   describe('Cryptographic Utilities', () => {

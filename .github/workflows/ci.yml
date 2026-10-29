@@ -20,38 +20,26 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 12.15.0
+      - name: Install root dependencies
+        run: npm install
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Install API dependencies
+        run: npm --prefix apps/api install
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile=false
+      - name: Install Web dependencies
+        run: npm --prefix apps/web install
 
       - name: Run Prisma Client Generate
-        run: pnpm --filter @doctalk/api prisma:generate
+        run: npm --prefix apps/api run prisma:generate
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npm run typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: npm run lint
 
       - name: Run Tests
-        run: pnpm test
+        run: npm run test
 
       - name: Run Production Build
-        run: pnpm build
+        run: npm run build

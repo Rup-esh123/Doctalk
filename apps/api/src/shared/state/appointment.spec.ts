@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { AppointmentStatus } from '../enums/index.js';
-import { canTransitionAppointment } from './appointment.js';
+import { AppointmentStatus } from '../enums';
+import { canTransitionAppointment } from './appointment';
 
 describe('Appointment State Machine Transitions', () => {
   it('allows valid HELD -> CONFIRMED transition upon payment', () => {

@@ -1,4 +1,4 @@
-import { UserRole, DoctorStatus, PracticeType, ConsultationMode, AppointmentStatus } from '../enums/index.js';
+import { UserRole, DoctorStatus, PracticeType, ConsultationMode, AppointmentStatus } from '../enums';
 
 export interface UserSessionPayload {
   id: string;

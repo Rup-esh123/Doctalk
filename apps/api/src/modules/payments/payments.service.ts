@@ -9,7 +9,7 @@ import {
   PaymentProvider,
 } from '../../providers/payment/payment.provider.interface.js';
 import { AppointmentsService } from '../appointments/appointments.service.js';
-import { ErrorCodes, LedgerAccount, LedgerDirection } from '@doctalk/shared';
+import { ErrorCodes, LedgerAccount, LedgerDirection } from '../../shared';
 import { randomUUID } from 'crypto';
 
 export interface StoredLedgerEntry {

@@ -17,7 +17,7 @@ import {
   cancelAppointmentSchema,
   UserRole,
   ErrorCodes,
-} from '@doctalk/shared';
+} from '../../shared';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 

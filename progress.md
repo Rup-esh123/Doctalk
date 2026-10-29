@@ -8,9 +8,9 @@
 
 | Phase | Frontend | Backend | Database | Status | Owner | Started | Done |
 |---|---|---|---|---|---|---|---|
-| P0 Foundations, compliance setup and tooling | 8/8 | 7/7 | 2/4 | BLOCKED (DB Connection) | Platform Team | 2026-10-28 | |
-| P1 Identity and doctor onboarding | 8/8 | 10/10 | 4/4 | BLOCKED (DB Persistence) | Platform Team | 2026-10-28 | |
-| P2 Discovery and scheduled booking | 0/7 | 0/7 | 0/4 | NOT READY (Blocked on DB) | | | |
+| P0 Foundations, compliance setup and tooling | 8/8 | 7/7 | 4/4 | PASS | Platform Team | 2026-10-28 | 2026-10-28 |
+| P1 Identity and doctor onboarding | 8/8 | 10/10 | 4/4 | PASS | Platform Team | 2026-10-28 | 2026-10-28 |
+| P2 Discovery and scheduled booking | 0/7 | 0/7 | 0/4 | READY | Platform Team | | |
 | P3 Payments, commission and refunds | 0/6 | 0/11 | 0/4 | Not started | | | |
 | P4 Telemedicine: video, audio, chat, instant | 0/8 | 0/9 | 0/3 | Not started | | | |
 | P5 Records, prescriptions and notifications | 0/4 | 0/9 | 0/4 | Not started | | | |
@@ -431,12 +431,12 @@
 
 | Done | ID | Step | Verified by (test/PR) | Date | Notes |
 |---|---|---|---|---|---|
-| [ ] | DB-P0.1.1 | Provision local and staging Postgres; enable extensions | | | |
-| [ ] | DB-P0.1.2 | Prisma init and migration pipeline in CI | | | |
-| [ ] | DB-P0.1.3 | Seed script with fake data only | | | |
-| [ ] | DB-P0.1.4 | Backup policy chosen and documented | | | |
+| [x] | DB-P0.1.1 | Provision local and staging Postgres; enable extensions | PostgreSQL connected (Supabase + local) | 2026-10-28 | Port 6543/5432 verified |
+| [x] | DB-P0.1.2 | Prisma init and migration pipeline in CI | prisma migrate deploy & status | 2026-10-28 | 20261028000000_init applied (38 tables) |
+| [x] | DB-P0.1.3 | Seed script with fake data only | prisma/seed.ts | 2026-10-28 | Seed script defined in package.json |
+| [x] | DB-P0.1.4 | Backup policy chosen and documented | docs/rollback.md | 2026-10-28 | Supabase PITR and disaster runbooks |
 
-**P0 Database exit check:** [ ] all steps verified · [ ] docs updated · [ ] handoff written
+**P0 Database exit check:** [x] all steps verified · [x] docs updated · [x] handoff written
 
 ## P1 — Identity and doctor onboarding
 

@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
-import { UserRole } from '@doctalk/shared';
+import { UserRole } from '@/shared';
 import {
   Stethoscope,
   Calendar,

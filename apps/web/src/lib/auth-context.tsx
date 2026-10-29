@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { UserRole } from '@doctalk/shared';
+import { UserRole } from '@/shared';
 import { AuthUser, getStoredUser, storeUser, clearUser } from './auth-store';
 import { apiClient } from './api-client';
 

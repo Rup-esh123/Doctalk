@@ -19,7 +19,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@doctalk/shared": ["src/shared/index.ts"],
+      "@doctalk/shared/*": ["src/shared/*"]
     }
   },
   "include": ["src/**/*", "prisma/**/*"],

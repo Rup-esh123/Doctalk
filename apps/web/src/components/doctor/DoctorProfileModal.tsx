@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DoctorSummary, formatINR } from '@doctalk/shared';
+import { DoctorSummary, formatINR } from '@/shared';
 import {
   X,
   CheckCircle2,

@@ -18,7 +18,10 @@ export class HealthController {
 
   @Get('readiness')
   async readiness() {
-    const isDbConnected = await this.prisma.checkHealth();
+    const isDbConnected =
+      typeof this.prisma?.checkHealth === 'function'
+        ? await this.prisma.checkHealth()
+        : !!this.prisma?.isConnected;
 
     if (!isDbConnected) {
       throw new ServiceUnavailableException({
